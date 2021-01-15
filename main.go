@@ -194,7 +194,7 @@ func decrypt(block *[]byte, key *[]byte, counter *[]byte) ([]byte, error) {
 
 func main() {
 	key := []byte("PeterBalivet2347")
-	file, err := fileDecrypt("test.MOV.ec", key)
+	file, err := fileEncrypt("test.MOV", key)
 
 	if err != nil {
 		os.Exit(1)
