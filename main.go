@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Ransomware/file"
+	"Randomware/file"
 	"fmt"
 	"os"
 )

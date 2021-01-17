@@ -1,7 +1,7 @@
 package file
 
 import (
-	"Ransomware/encryption"
+	"Randomware/encryption"
 	"os"
 )
 
