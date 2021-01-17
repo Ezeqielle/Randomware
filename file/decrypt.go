@@ -8,7 +8,7 @@ import (
 // Decrypt : decrypts file with key
 func Decrypt(fileSrc string, key []byte) (string, error) {
 
-	decryptedFileName := fileSrc[0 : len(fileSrc)-3]
+	decryptedFileName := fileSrc[0 : len(fileSrc)-len(EncryptedExt)]
 	encryptedFile, err := os.Open(fileSrc)
 
 	counter := []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -28,7 +28,7 @@ func Decrypt(fileSrc string, key []byte) (string, error) {
 	data := make([]byte, MaxSize)
 	iterations := fi.Size() / int64(MaxSize)
 
-	//Creates encrypted File
+	//Creates decrypted File
 	decryptedFile, err := os.Create(decryptedFileName)
 
 	if err != nil {
@@ -37,7 +37,7 @@ func Decrypt(fileSrc string, key []byte) (string, error) {
 
 	defer decryptedFile.Close()
 
-	//Encrypts chunks of MaxSize data to encrypted file
+	//Decrypts chunks of MaxSize data to encrypted file
 	for i = 0; i < iterations; i++ {
 		encryptedFile.Read(data)
 		encryption.Decrypt(&data, &key, &counter)
@@ -49,7 +49,7 @@ func Decrypt(fileSrc string, key []byte) (string, error) {
 		decryptedFile.Sync()
 	}
 
-	//Encrypts remaining of file (less then MaxSize)
+	//Decrypts remaining of file (less then MaxSize)
 	if fi.Size()%int64(MaxSize) != 0 {
 		data = make([]byte, fi.Size()-iterations*int64(MaxSize))
 		encryptedFile.Read(data)

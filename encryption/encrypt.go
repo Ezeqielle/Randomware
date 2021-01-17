@@ -21,13 +21,14 @@ func Encrypt(block *[]byte, key *[]byte, counter *[]byte) ([]byte, error) {
 	if err != nil {
 		return *block, err
 	}
+
 	if len(*block)%int(SIZE) != 0 {
 		PadBytes(block)
 	}
+
 	ciphertext := make([]byte, len(*block))
 	stream := cipher.NewCTR(cipherKey, *counter)
 	stream.XORKeyStream(ciphertext, *block)
-	// The IV needs to be unique, but not secure.
 
 	*block = ciphertext
 	return ciphertext, nil

@@ -8,7 +8,7 @@ import (
 // Encrypt : encrypts file with key
 func Encrypt(fileSrc string, key []byte) (string, error) {
 
-	encryptedFileName := fileSrc + ".ec"
+	encryptedFileName := fileSrc + EncryptedExt
 	decryptedFile, err := os.Open(fileSrc)
 
 	counter := []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}

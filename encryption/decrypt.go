@@ -23,8 +23,6 @@ func Decrypt(block *[]byte, key *[]byte, counter *[]byte) ([]byte, error) {
 	plaintext := make([]byte, len(*block))
 	stream := cipher.NewCTR(cipherKey, *counter)
 	stream.XORKeyStream(plaintext, *block)
-	// The IV needs to be unique, but not secure. Therefore it's common to
-	// include it at the beginning of the ciphertext.
 
 	*block = plaintext
 	UnpadBytes(block)
