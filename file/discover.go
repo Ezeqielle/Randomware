@@ -1,31 +1,39 @@
 package file
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 )
 
-func visit(files *[]string) filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			log.Fatal(err)
+// Discover : returns array of strings of either files or folders in a root directory
+func Discover(root string) ([]string, []string, error) {
+	var files []string
+	var folders []string
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			files = append(files, path)
+		} else {
+			folders = append(folders, path)
 		}
-		*files = append(*files, path)
 		return nil
-	}
+	})
+	return files, folders, err
 }
 
-/*
-func main() {
-	var files []string
-
-	root := "/home/maki/go/src/"
-	err := filepath.Walk(root, visit(&files))
+// DiscoverFiles : returns array of strings of  files or folders in a root directory
+func DiscoverFiles(root string) ([]string, error) {
+	files, _, err := Discover(root)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	for _, file := range files {
-		fmt.Println(file)
+	return files, nil
+}
+
+// DiscoverFolders : returns array of strings of  files or folders in a root directory
+func DiscoverFolders(root string) ([]string, error) {
+	_, folders, err := Discover(root)
+	if err != nil {
+		return nil, err
 	}
-} */
+	return folders, nil
+}

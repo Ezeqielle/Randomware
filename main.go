@@ -16,6 +16,7 @@ const PrivKeyFile string = "rsa_private_key.priv"
 
 func main() {
 	if false {
+		//File Encryption
 		privateKey, publicKey := keys.GenerateKeyPair(4096)
 		file.BytesToNewFile(PubKeyFile, keys.PublicKeyToBytes(publicKey))
 		file.BytesToNewFile(PrivKeyFile, keys.PrivateKeyToBytes(privateKey))
@@ -29,6 +30,7 @@ func main() {
 
 		fmt.Println(file)
 	} else {
+		//File Decryption
 		encryptedKey, err := file.BytesFromFile("safe_key")
 		if err != nil {
 			log.Fatal(err)
