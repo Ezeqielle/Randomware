@@ -8,14 +8,19 @@ import (
 	"log"
 )
 
+// PubKeyFile : is the public key file name
+const PubKeyFile string = "rsa_public_key.pub"
+
+// PrivKeyFile : is the private key file name
+const PrivKeyFile string = "rsa_private_key.priv"
+
 func main() {
 	if false {
 		privateKey, publicKey := keys.GenerateKeyPair(4096)
-		file.BytesToNewFile("rsa_public_key.pub", keys.PublicKeyToBytes(publicKey))
-		file.BytesToNewFile("rsa_private_key.priv", keys.PrivateKeyToBytes(privateKey))
+		file.BytesToNewFile(PubKeyFile, keys.PublicKeyToBytes(publicKey))
+		file.BytesToNewFile(PrivKeyFile, keys.PrivateKeyToBytes(privateKey))
 		//Encrypt file
 		key := encryption.GenKey()
-		fmt.Println(key, '\n')
 		file.BytesToNewFile("safe_key", keys.EncryptWithPublicKey(key, publicKey))
 		file, err := file.Encrypt("test.mp4", key)
 		if err != nil {
@@ -28,7 +33,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		privateKeyBytes, err := file.BytesFromFile("rsa_private_key.priv")
+		privateKeyBytes, err := file.BytesFromFile(PrivKeyFile)
 		if err != nil {
 			log.Fatal(err)
 		}
