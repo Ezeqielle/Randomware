@@ -1,7 +1,6 @@
-package main
+package file
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,6 +16,7 @@ func visit(files *[]string) filepath.WalkFunc {
 	}
 }
 
+/*
 func main() {
 	var files []string
 
@@ -28,4 +28,4 @@ func main() {
 	for _, file := range files {
 		fmt.Println(file)
 	}
-}
+} */
