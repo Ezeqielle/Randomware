@@ -2,6 +2,9 @@ package file
 
 import "os"
 
+// MaxThreads : is the maximum threads for files encryption/decryption
+const MaxThreads int = 10
+
 //MaxSize : maximun allowed Bytes size to be loaded in memory
 const MaxSize int = 26214400
 

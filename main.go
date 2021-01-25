@@ -48,7 +48,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println(nbrFiles)
+		fmt.Println("Decrypted files number: ", nbrFiles)
 	}
 
 }
