@@ -41,11 +41,11 @@ func BytesToPrivateKey(priv []byte) *rsa.PrivateKey {
 }
 
 // DecryptWithPrivateKey : decrypts data with private key
-func DecryptWithPrivateKey(ciphertext []byte, priv *rsa.PrivateKey) []byte {
+func DecryptWithPrivateKey(ciphertext []byte, priv *rsa.PrivateKey) *[]byte {
 	hash := sha512.New()
 	plaintext, err := rsa.DecryptOAEP(hash, rand.Reader, priv, ciphertext, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return plaintext
+	return &plaintext
 }

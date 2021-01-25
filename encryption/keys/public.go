@@ -48,9 +48,9 @@ func BytesToPublicKey(pub []byte) *rsa.PublicKey {
 }
 
 // EncryptWithPublicKey : encrypts data with public key
-func EncryptWithPublicKey(msg []byte, pub *rsa.PublicKey) []byte {
+func EncryptWithPublicKey(msg *[]byte, pub *rsa.PublicKey) []byte {
 	hash := sha512.New()
-	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, pub, msg, nil)
+	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, pub, *msg, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

