@@ -1,11 +1,10 @@
 package main
 
 import (
-	"Randomware/encryption"
-	"Randomware/encryption/keys"
-	"Randomware/file"
-	"fmt"
-	"log"
+	"strings"
+
+	"github.com/lxn/walk"
+	. "github.com/lxn/walk/declarative"
 )
 
 // PubKeyFile : is the public key file name
@@ -15,7 +14,7 @@ const PubKeyFile string = "rsa_public_key.pub"
 const PrivKeyFile string = "rsa_private_key.priv"
 
 func main() {
-	if false {
+	/* if false {
 		//File Encryption
 		privateKey, publicKey := keys.GenerateKeyPair(4096)
 		file.BytesToNewFile(PubKeyFile, keys.PublicKeyToBytes(publicKey))
@@ -49,6 +48,28 @@ func main() {
 		}
 
 		fmt.Println("Decrypted files number: ", nbrFiles)
-	}
+	} */
+
+	var inTE, outTE *walk.TextEdit
+
+	MainWindow{
+		Title:   "SCREAMO",
+		MinSize: Size{600, 400},
+		Layout:  VBox{},
+		Children: []Widget{
+			HSplitter{
+				Children: []Widget{
+					TextEdit{AssignTo: &inTE},
+					TextEdit{AssignTo: &outTE, ReadOnly: true},
+				},
+			},
+			PushButton{
+				Text: "SCREAM",
+				OnClicked: func() {
+					outTE.SetText(strings.ToUpper(inTE.Text()))
+				},
+			},
+		},
+	}.Run()
 
 }
