@@ -7,3 +7,5 @@ Requirements:
         -check that C:\TDM-GCC-64\bin is in PATH
         -execute : go get github.com/lxn/walk
         -execute: go get github.com/akavel/rsrc
+    Compile:
+        go build -ldflags="-H windowsgui"
