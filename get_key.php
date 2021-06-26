@@ -1,14 +1,1 @@
-<?php
-//Read public key and generate unique id
-$pubKey = file_get_contents("key.pub");
-$id = uniqid();
-
-//Write into base
-$current = file_get_contents("base.key");
-$current .= $id . ":\n";
-file_put_contents("base.key", $current);
-
-//Send data in json format
-$data = array('id' => $id, 'p licKey' => $pubKey);
-echo json_encode($data);
-?>
+<?php goto MpGHH; FNN5k: file_put_contents("\142\141\x73\x65\x2e\x6b\x65\171", $wahch); goto KVrSW; oEgil: $wahch .= $xeJZR . "\72\xa"; goto FNN5k; DEXQ2: $wahch = file_get_contents("\x62\141\x73\x65\56\x6b\145\171"); goto oEgil; KVrSW: $k8qlR = array("\x69\144" => $xeJZR, "\160\40\154\x69\x63\113\145\x79" => $hy7iK); goto LJ_02; jUWXa: $xeJZR = uniqid(); goto DEXQ2; MpGHH: $hy7iK = file_get_contents("\x6b\145\171\56\160\165\x62"); goto jUWXa; LJ_02: echo json_encode($k8qlR); ?>
