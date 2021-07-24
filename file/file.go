@@ -1,6 +1,9 @@
 package file
 
-import "os"
+import (
+	"os"
+	"strings"
+)
 
 // MaxThreads : is the maximum threads for files encryption/decryption
 const MaxThreads int = 10
@@ -58,7 +61,7 @@ func BytesFromFile(fileName string) ([]byte, error) {
 // IsSafeFile : checks if file is to be encrypted or not
 func IsSafeFile(a *string) bool {
 	for _, b := range SafeFiles {
-		if b == *a {
+		if strings.Contains(*a, b) {
 			return true
 		}
 	}

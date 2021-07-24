@@ -13,6 +13,11 @@ import (
 // WindowsEscalate : bypasses User Account Control of Windows and escaletes
 func WindowsEscalate(path string) (err error) {
 	log.Println("Path for bypass: (", path, ")")
+
+	if ComputerDefaults(path) == nil {
+		log.Println("computerdefaults")
+		return
+	}
 	if SilentCleanUp(path) == nil {
 		log.Println("silentCleanUp")
 		return
@@ -31,10 +36,6 @@ func WindowsEscalate(path string) (err error) {
 	}
 	if FodHelper(path) == nil {
 		log.Println("fodhelper")
-		return
-	}
-	if ComputerDefaults(path) == nil {
-		log.Println("computerdefaults")
 		return
 	}
 

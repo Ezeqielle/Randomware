@@ -20,7 +20,7 @@ func Discover(root string) ([]string, []string, error) {
 	return files, folders, err
 }
 
-// DiscoverFiles : returns array of strings of  files or folders in a root directory
+// DiscoverFiles : returns array of strings of  files in a root directory
 func DiscoverFiles(root string) ([]string, error) {
 	files, _, err := Discover(root)
 	if err != nil {
@@ -29,7 +29,7 @@ func DiscoverFiles(root string) ([]string, error) {
 	return files, nil
 }
 
-// DiscoverFolders : returns array of strings of  files or folders in a root directory
+// DiscoverFolders : returns array of strings of   folders in a root directory
 func DiscoverFolders(root string) ([]string, error) {
 	_, folders, err := Discover(root)
 	if err != nil {

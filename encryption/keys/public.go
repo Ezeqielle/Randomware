@@ -3,7 +3,7 @@ package keys
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha512"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"log"
@@ -11,11 +11,7 @@ import (
 
 // PublicKeyToBytes : public key to bytes
 func PublicKeyToBytes(pub *rsa.PublicKey) []byte {
-	pubASN1, err := x509.MarshalPKIXPublicKey(pub)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	pubASN1 := x509.MarshalPKCS1PublicKey(pub)
 	pubBytes := pem.EncodeToMemory(&pem.Block{
 		Type:  "RSA PUBLIC KEY",
 		Bytes: pubASN1,
@@ -36,20 +32,16 @@ func BytesToPublicKey(pub []byte) *rsa.PublicKey {
 			log.Fatal(err)
 		}
 	}
-	ifc, err := x509.ParsePKIXPublicKey(b)
+	key, err := x509.ParsePKCS1PublicKey(b)
 	if err != nil {
 		log.Fatal(err)
-	}
-	key, ok := ifc.(*rsa.PublicKey)
-	if !ok {
-		log.Fatal("Bad public key")
 	}
 	return key
 }
 
 // EncryptWithPublicKey : encrypts data with public key
 func EncryptWithPublicKey(msg *[]byte, pub *rsa.PublicKey) []byte {
-	hash := sha512.New()
+	hash := sha256.New()
 	ciphertext, err := rsa.EncryptOAEP(hash, rand.Reader, pub, *msg, nil)
 	if err != nil {
 		log.Fatal(err)

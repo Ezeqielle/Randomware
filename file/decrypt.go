@@ -3,6 +3,7 @@ package file
 import (
 	"Randomware/encryption"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -98,7 +99,7 @@ func DecryptAll(rootFolder string, key *[]byte) (uint64, error) {
 					wg.Done()
 					return
 				}
-				if file[len(file)-(len(EncryptedExt)+len(HostName)):] == HostName+EncryptedExt {
+				if strings.Contains(file, HostName+EncryptedExt) {
 					_, err := Decrypt(file, key)
 					if err == nil {
 						mutex.Lock()
